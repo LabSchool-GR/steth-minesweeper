@@ -90,7 +90,11 @@ var status_panel: PanelContainer
 var status_label: Label
 var mines_label: Label
 var time_label: Label
+var body_flow: HFlowContainer
+var board_center: CenterContainer
 var side_column: VBoxContainer
+var instruments_panel: PanelContainer
+var instruments_grid: GridContainer
 var score_panel: PanelContainer
 var score_scroll: ScrollContainer
 var best_label: Label
@@ -350,21 +354,21 @@ func _build_status(layout: VBoxContainer) -> void:
 
 
 func _build_game_area(layout: VBoxContainer) -> void:
-	var body := HFlowContainer.new()
-	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	body.alignment = FlowContainer.ALIGNMENT_CENTER
-	body.add_theme_constant_override("h_separation", 14)
-	body.add_theme_constant_override("v_separation", 14)
-	layout.add_child(body)
+	body_flow = HFlowContainer.new()
+	body_flow.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body_flow.alignment = FlowContainer.ALIGNMENT_CENTER
+	body_flow.add_theme_constant_override("h_separation", 14)
+	body_flow.add_theme_constant_override("v_separation", 14)
+	layout.add_child(body_flow)
 
-	var center := CenterContainer.new()
-	center.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	center.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	body.add_child(center)
+	board_center = CenterContainer.new()
+	board_center.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	board_center.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	body_flow.add_child(board_center)
 
 	var board_panel := PanelContainer.new()
 	board_panel.add_theme_stylebox_override("panel", _box(Color("#071a16"), COLORS.teal, 2, 8))
-	center.add_child(board_panel)
+	board_center.add_child(board_panel)
 
 	grid = GridContainer.new()
 	grid.add_theme_constant_override("h_separation", 3)
@@ -374,15 +378,17 @@ func _build_game_area(layout: VBoxContainer) -> void:
 	side_column = VBoxContainer.new()
 	side_column.custom_minimum_size = Vector2(270, 0)
 	side_column.add_theme_constant_override("separation", 14)
-	body.add_child(side_column)
+	body_flow.add_child(side_column)
 
-	var instruments_panel := PanelContainer.new()
+	instruments_panel = PanelContainer.new()
 	instruments_panel.add_theme_stylebox_override("panel", _box(Color("#101628"), COLORS.yellow, 1, 8))
 	side_column.add_child(instruments_panel)
 
-	var instruments_box := VBoxContainer.new()
-	instruments_box.add_theme_constant_override("separation", 8)
-	instruments_panel.add_child(instruments_box)
+	instruments_grid = GridContainer.new()
+	instruments_grid.columns = 1
+	instruments_grid.add_theme_constant_override("h_separation", 8)
+	instruments_grid.add_theme_constant_override("v_separation", 8)
+	instruments_panel.add_child(instruments_grid)
 
 	flag_mode = Button.new()
 	flag_mode.text = _tr("toggle.flag")
@@ -390,15 +396,15 @@ func _build_game_area(layout: VBoxContainer) -> void:
 	flag_mode.toggle_mode = true
 	flag_mode.custom_minimum_size = Vector2(0, 42)
 	_style_toggle_button(flag_mode)
-	instruments_box.add_child(flag_mode)
+	instruments_grid.add_child(flag_mode)
 
 	mines_label = _hud_label()
 	mines_label.custom_minimum_size = Vector2(0, 42)
-	instruments_box.add_child(mines_label)
+	instruments_grid.add_child(mines_label)
 
 	time_label = _hud_label()
 	time_label.custom_minimum_size = Vector2(0, 42)
-	instruments_box.add_child(time_label)
+	instruments_grid.add_child(time_label)
 
 	score_panel = PanelContainer.new()
 	score_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -718,7 +724,12 @@ func _resize_cells() -> void:
 	var cell_width: float = (available_width - board_padding - board_gaps) / cols
 	var max_cell_size := 44.0
 	if mobile_layout:
-		max_cell_size = 76.0
+		if cols <= 8:
+			max_cell_size = 64.0
+		elif cols <= 10:
+			max_cell_size = 58.0
+		else:
+			max_cell_size = 48.0
 	var cell_size: float = floor(min(max_cell_size, min(cell_width, available_height / rows)))
 	cell_size = max(18.0, cell_size)
 	current_cell_size = cell_size
@@ -726,6 +737,7 @@ func _resize_cells() -> void:
 	for row in cell_buttons:
 		for button in row:
 			button.custom_minimum_size = Vector2(cell_size, cell_size)
+	_apply_responsive_layout(mobile_layout)
 	_update_status_panel_width()
 	_update_page_section_widths()
 	_update_side_column_height()
@@ -902,6 +914,38 @@ func _hud_label() -> Label:
 	return label
 
 
+func _apply_responsive_layout(mobile_layout: bool) -> void:
+	if body_flow == null or board_center == null or side_column == null or score_panel == null:
+		return
+
+	if mobile_layout:
+		# Σε κινητό βάζουμε πρώτα τα εργαλεία, μετά το πλέγμα και στο τέλος το TOP10.
+		# Έτσι ο παίκτης δεν χρειάζεται να κάνει scroll για να αλλάξει τη λειτουργία σημαίας.
+		if score_panel.get_parent() != body_flow:
+			score_panel.reparent(body_flow)
+		body_flow.move_child(side_column, 0)
+		body_flow.move_child(board_center, 1)
+		body_flow.move_child(score_panel, 2)
+		instruments_grid.columns = 3
+		flag_mode.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		mines_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		time_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		score_panel.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		return
+
+	# Σε υπολογιστή κρατάμε την κλασική διάταξη: ταμπλό αριστερά, εργαλεία και TOP10 δεξιά.
+	if score_panel.get_parent() != side_column:
+		score_panel.reparent(side_column)
+	body_flow.move_child(board_center, 0)
+	body_flow.move_child(side_column, 1)
+	side_column.move_child(score_panel, 1)
+	instruments_grid.columns = 1
+	flag_mode.size_flags_horizontal = Control.SIZE_FILL
+	mines_label.size_flags_horizontal = Control.SIZE_FILL
+	time_label.size_flags_horizontal = Control.SIZE_FILL
+	score_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+
+
 func _update_status_panel_width() -> void:
 	if status_panel == null:
 		return
@@ -919,12 +963,15 @@ func _update_page_section_widths() -> void:
 func _content_width() -> float:
 	var board_width: float = cols * current_cell_size + max(0, cols - 1) * current_cell_gap + 20.0
 	var score_width: float = 270.0
-	var content_width: float = board_width + 14.0 + score_width
-
-	# Σε στενές οθόνες το TOP10 πέφτει κάτω από το ταμπλό, άρα το status ακολουθεί το πλάτος του ταμπλό.
 	var outer_margins := 40.0
 	if _use_mobile_layout():
 		outer_margins = 24.0
+		var mobile_width: float = max(220.0, size.x - outer_margins)
+		return min(mobile_width, max(board_width, 320.0))
+
+	var content_width: float = board_width + 14.0 + score_width
+
+	# Σε στενές οθόνες το TOP10 πέφτει κάτω από το ταμπλό, άρα το status ακολουθεί το πλάτος του ταμπλό.
 	if size.x > 0.0 and content_width > size.x - outer_margins:
 		content_width = max(board_width, score_width)
 
@@ -990,6 +1037,19 @@ func _update_side_column_height() -> void:
 		return
 
 	var board_height: float = rows * current_cell_size + max(0, rows - 1) * current_cell_gap + 20.0
+
+	if _use_mobile_layout():
+		var target_width: float = _content_width()
+		var item_width: float = max(90.0, floor((target_width - 16.0) / 3.0))
+		side_column.custom_minimum_size = Vector2(target_width, 0.0)
+		instruments_panel.custom_minimum_size = Vector2(target_width, 0.0)
+		flag_mode.custom_minimum_size = Vector2(item_width, 40.0)
+		mines_label.custom_minimum_size = Vector2(item_width, 40.0)
+		time_label.custom_minimum_size = Vector2(item_width, 40.0)
+		score_panel.custom_minimum_size = Vector2(target_width, 130.0)
+		score_scroll.custom_minimum_size = Vector2(0.0, 42.0)
+		return
+
 	side_column.custom_minimum_size = Vector2(270.0, board_height)
 
 	if _current_difficulty_key() == "small":

@@ -14,16 +14,6 @@
 ..\Godot_v4.7-stable_win64_console.exe --path . --editor
 ```
 
-## Δημοσίευση
-
-Οι φάκελοι `Demo` και `DemoWindows` περιέχουν έτοιμες εξαγωγές για δοκιμή.
-Έχουν `.gdignore`, ώστε το Godot να μην τους διαβάζει ως πόρους του project.
-
-Πριν από νέα δημοσίευση, κάνουμε πάντα νέο export από τα presets:
-
-- `Web` προς `Demo/index.html`
-- `Windows Desktop` προς `DemoWindows/steth.exe`
-
 ## Γλώσσες
 
 Το παιχνίδι είναι δίγλωσσο:

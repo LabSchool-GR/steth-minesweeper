@@ -4,13 +4,18 @@
 *.godot text eol=lf
 *.cfg text eol=lf
 *.json text eol=lf
+*.html text eol=lf
+*.js text eol=lf
 *.md text eol=lf
 *.uid text eol=lf
 *.import text eol=lf
 *.gitignore text eol=lf
 .gitattributes text eol=lf
+.nojekyll text eol=lf
 
 # Binary assets.
 *.png binary
 *.ico binary
 *.woff2 binary
+*.pck binary
+*.wasm binary

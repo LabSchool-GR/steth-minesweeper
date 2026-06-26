@@ -387,6 +387,7 @@ func _build_game_area(layout: VBoxContainer) -> void:
 
 	instruments_grid = GridContainer.new()
 	instruments_grid.columns = 1
+	instruments_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	instruments_grid.add_theme_constant_override("h_separation", 8)
 	instruments_grid.add_theme_constant_override("v_separation", 8)
 	instruments_panel.add_child(instruments_grid)
@@ -957,9 +958,9 @@ func _apply_responsive_layout(mobile_layout: bool) -> void:
 	body_flow.move_child(side_column, 1)
 	side_column.move_child(score_panel, 1)
 	instruments_grid.columns = 1
-	flag_mode.size_flags_horizontal = Control.SIZE_FILL
-	mines_label.size_flags_horizontal = Control.SIZE_FILL
-	time_label.size_flags_horizontal = Control.SIZE_FILL
+	flag_mode.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	mines_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	time_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	score_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 
 

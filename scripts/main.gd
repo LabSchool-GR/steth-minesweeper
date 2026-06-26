@@ -82,6 +82,7 @@ var icon_font: Font
 var logo_texture: Texture2D
 
 var main_scroll: ScrollContainer
+var root_margin: MarginContainer
 var page_layout: VBoxContainer
 var top_spacer: Control
 var bottom_spacer: Control
@@ -185,19 +186,19 @@ func _build_interface() -> void:
 	main_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(main_scroll)
 
-	var root := MarginContainer.new()
-	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	root.add_theme_constant_override("margin_left", 20)
-	root.add_theme_constant_override("margin_right", 20)
-	root.add_theme_constant_override("margin_top", 0)
-	root.add_theme_constant_override("margin_bottom", 0)
-	main_scroll.add_child(root)
+	root_margin = MarginContainer.new()
+	root_margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root_margin.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	root_margin.add_theme_constant_override("margin_left", 20)
+	root_margin.add_theme_constant_override("margin_right", 20)
+	root_margin.add_theme_constant_override("margin_top", 0)
+	root_margin.add_theme_constant_override("margin_bottom", 0)
+	main_scroll.add_child(root_margin)
 
 	var vertical_frame := VBoxContainer.new()
 	vertical_frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vertical_frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	root.add_child(vertical_frame)
+	root_margin.add_child(vertical_frame)
 
 	top_spacer = Control.new()
 	vertical_frame.add_child(top_spacer)
@@ -699,6 +700,9 @@ func _resize_cells() -> void:
 	# Responsive υπολογισμός μεγέθους κελιού.
 	# Δεν κλιμακώνουμε απλώς όλο το παράθυρο: υπολογίζουμε διαθέσιμο χώρο,
 	# κενά ανάμεσα στα κελιά, περιθώρια και τη δεξιά στήλη πληροφοριών.
+	var mobile_layout := _use_mobile_layout()
+	_update_root_margins(mobile_layout)
+
 	current_cell_gap = 3.0
 	if size.x < 420.0:
 		current_cell_gap = 2.0
@@ -708,10 +712,9 @@ func _resize_cells() -> void:
 	grid.add_theme_constant_override("h_separation", int(current_cell_gap))
 	grid.add_theme_constant_override("v_separation", int(current_cell_gap))
 
-	var mobile_layout := _use_mobile_layout()
 	var outer_margins := 40.0
 	if mobile_layout:
-		outer_margins = 24.0
+		outer_margins = 12.0
 	var board_padding := 20.0
 	var side_width := 270.0
 	var flow_gap := 14.0
@@ -725,11 +728,11 @@ func _resize_cells() -> void:
 	var max_cell_size := 44.0
 	if mobile_layout:
 		if cols <= 8:
-			max_cell_size = 64.0
+			max_cell_size = 92.0
 		elif cols <= 10:
-			max_cell_size = 58.0
+			max_cell_size = 76.0
 		else:
-			max_cell_size = 48.0
+			max_cell_size = 58.0
 	var cell_size: float = floor(min(max_cell_size, min(cell_width, available_height / rows)))
 	cell_size = max(18.0, cell_size)
 	current_cell_size = cell_size
@@ -737,6 +740,7 @@ func _resize_cells() -> void:
 	for row in cell_buttons:
 		for button in row:
 			button.custom_minimum_size = Vector2(cell_size, cell_size)
+
 	_apply_responsive_layout(mobile_layout)
 	_update_status_panel_width()
 	_update_page_section_widths()
@@ -914,6 +918,22 @@ func _hud_label() -> Label:
 	return label
 
 
+func _update_root_margins(mobile_layout: bool) -> void:
+	if root_margin == null:
+		return
+
+	var horizontal_margin := 20
+	var vertical_margin := 0
+	if mobile_layout:
+		horizontal_margin = 6
+		vertical_margin = 6
+
+	root_margin.add_theme_constant_override("margin_left", horizontal_margin)
+	root_margin.add_theme_constant_override("margin_right", horizontal_margin)
+	root_margin.add_theme_constant_override("margin_top", vertical_margin)
+	root_margin.add_theme_constant_override("margin_bottom", vertical_margin)
+
+
 func _apply_responsive_layout(mobile_layout: bool) -> void:
 	if body_flow == null or board_center == null or side_column == null or score_panel == null:
 		return
@@ -965,9 +985,9 @@ func _content_width() -> float:
 	var score_width: float = 270.0
 	var outer_margins := 40.0
 	if _use_mobile_layout():
-		outer_margins = 24.0
+		outer_margins = 12.0
 		var mobile_width: float = max(220.0, size.x - outer_margins)
-		return min(mobile_width, max(board_width, 320.0))
+		return mobile_width
 
 	var content_width: float = board_width + 14.0 + score_width
 
@@ -1041,12 +1061,13 @@ func _update_side_column_height() -> void:
 	if _use_mobile_layout():
 		var target_width: float = _content_width()
 		var item_width: float = max(90.0, floor((target_width - 16.0) / 3.0))
+		var remaining_height: float = max(150.0, size.y - board_height - 360.0)
 		side_column.custom_minimum_size = Vector2(target_width, 0.0)
 		instruments_panel.custom_minimum_size = Vector2(target_width, 0.0)
 		flag_mode.custom_minimum_size = Vector2(item_width, 40.0)
 		mines_label.custom_minimum_size = Vector2(item_width, 40.0)
 		time_label.custom_minimum_size = Vector2(item_width, 40.0)
-		score_panel.custom_minimum_size = Vector2(target_width, 130.0)
+		score_panel.custom_minimum_size = Vector2(target_width, remaining_height)
 		score_scroll.custom_minimum_size = Vector2(0.0, 42.0)
 		return
 

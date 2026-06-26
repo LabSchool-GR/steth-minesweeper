@@ -44,9 +44,8 @@
 - `staff/images/logo.png`: λογότυπο STETH για το περιβάλλον της εφαρμογής.
 - `staff/images/splash.png`: εισαγωγική οθόνη φόρτωσης για desktop και web export.
 - `staff/webfonts/fa-solid-900.woff2`: Font Awesome Solid για εικονίδια σημαίας και βόμβας.
-- `staff/webfonts/fa-regular-400.woff2` και `fa-brands-400.woff2`: διαθέσιμα για μελλοντική χρήση.
 
-Οι γραμματοσειρές μπορούν να χρησιμοποιηθούν ως εικονίδια. Για εκπαιδευτική καθαρότητα, τα codepoints δηλώνονται στην αρχή του `scripts/main.gd` ως σταθερές.
+Η γραμματοσειρά μπορεί να χρησιμοποιηθεί ως συλλογή εικονιδίων. Για εκπαιδευτική καθαρότητα, τα codepoints δηλώνονται στην αρχή του `scripts/main.gd` ως σταθερές.
 
 Η οθόνη φόρτωσης ορίζεται στο `project.godot`, στις ρυθμίσεις `application/boot_splash`.
 Στο web export το Godot τη μετατρέπει αυτόματα στο αρχείο `Demo/index.png`.

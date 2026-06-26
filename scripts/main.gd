@@ -452,10 +452,9 @@ func _build_footer(layout: VBoxContainer) -> void:
 	layout.add_child(footer_center)
 	page_sections.append(footer_center)
 
-	var footer_links := HFlowContainer.new()
-	footer_links.alignment = FlowContainer.ALIGNMENT_CENTER
+	var footer_links := HBoxContainer.new()
+	footer_links.alignment = BoxContainer.ALIGNMENT_CENTER
 	footer_links.add_theme_constant_override("h_separation", 8)
-	footer_links.add_theme_constant_override("v_separation", 2)
 	footer_center.add_child(footer_links)
 
 	var docs_link := _footer_link(_tr("footer.documentation"))

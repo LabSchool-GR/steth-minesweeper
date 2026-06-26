@@ -26,6 +26,8 @@ const LANGUAGE_FILES := {
 	"el": "res://locales/el.json",
 	"en": "res://locales/en.json"
 }
+const DOCUMENTATION_URL := "https://github.com/LabSchool-GR/steth-minesweeper"
+const WINDOWS_DOWNLOAD_URL := "https://github.com/LabSchool-GR/steth-minesweeper/releases"
 
 # Κωδικοί Font Awesome. Οι γραμματοσειρές βρίσκονται στον φάκελο staff/webfonts.
 # Αν αλλάξει η γραμματοσειρά, αλλάζουμε μόνο αυτά τα codepoints.
@@ -215,6 +217,7 @@ func _build_interface() -> void:
 	_build_header(page_layout)
 	_build_status(page_layout)
 	_build_game_area(page_layout)
+	_build_footer(page_layout)
 
 
 func _rebuild_interface_after_language_change() -> void:
@@ -441,6 +444,33 @@ func _build_game_area(layout: VBoxContainer) -> void:
 	score_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	score_list.add_theme_constant_override("separation", 4)
 	score_scroll.add_child(score_list)
+
+
+func _build_footer(layout: VBoxContainer) -> void:
+	var footer_center := CenterContainer.new()
+	footer_center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	layout.add_child(footer_center)
+	page_sections.append(footer_center)
+
+	var footer_links := HFlowContainer.new()
+	footer_links.alignment = FlowContainer.ALIGNMENT_CENTER
+	footer_links.add_theme_constant_override("h_separation", 8)
+	footer_links.add_theme_constant_override("v_separation", 2)
+	footer_center.add_child(footer_links)
+
+	var docs_link := _footer_link(_tr("footer.documentation"))
+	docs_link.pressed.connect(_open_external_url.bind(DOCUMENTATION_URL))
+	footer_links.add_child(docs_link)
+
+	var separator := Label.new()
+	separator.text = "|"
+	separator.add_theme_font_size_override("font_size", 13)
+	separator.add_theme_color_override("font_color", _fade(COLORS.muted, 0.75))
+	footer_links.add_child(separator)
+
+	var windows_link := _footer_link(_tr("footer.windows_download"))
+	windows_link.pressed.connect(_open_external_url.bind(WINDOWS_DOWNLOAD_URL))
+	footer_links.add_child(windows_link)
 
 
 func _start_new_game() -> void:
@@ -1096,6 +1126,21 @@ func _score_label(text: String, color: Color) -> Label:
 	label.add_theme_font_size_override("font_size", 14)
 	label.add_theme_color_override("font_color", color)
 	return label
+
+
+func _footer_link(text: String) -> LinkButton:
+	var link := LinkButton.new()
+	link.text = text
+	link.focus_mode = Control.FOCUS_NONE
+	link.add_theme_font_size_override("font_size", 13)
+	link.add_theme_color_override("font_color", _fade(COLORS.muted, 0.85))
+	link.add_theme_color_override("font_hover_color", COLORS.yellow)
+	link.add_theme_color_override("font_pressed_color", COLORS.teal)
+	return link
+
+
+func _open_external_url(url: String) -> void:
+	OS.shell_open(url)
 
 
 func _style_select(select: OptionButton) -> void:

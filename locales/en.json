@@ -24,5 +24,7 @@
 	"score.best_for": "Best times for: %s",
 	"score.empty": "No score yet. Win a round to enter the board.",
 	"score.player_fallback": "Player",
-	"score.anonymous": "Anonymous"
+	"score.anonymous": "Anonymous",
+	"footer.documentation": "Application Documentation",
+	"footer.windows_download": "Download for MS Windows"
 }

@@ -24,5 +24,7 @@
 	"score.best_for": "Καλύτεροι χρόνοι για: %s",
 	"score.empty": "Δεν υπάρχει ακόμα σκορ. Κερδίστε μια παρτίδα για να γραφτείτε εδώ.",
 	"score.player_fallback": "Παίκτης",
-	"score.anonymous": "Ανώνυμος"
+	"score.anonymous": "Ανώνυμος",
+	"footer.documentation": "Τεκμηρίωση Εφαρμογής",
+	"footer.windows_download": "Λήψη για MS Windows"
 }

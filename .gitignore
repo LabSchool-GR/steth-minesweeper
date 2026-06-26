@@ -1,0 +1,22 @@
+# Godot editor cache and generated import data
+.godot/
+
+# Local exported builds
+Demo/
+DemoWindows/
+
+# Local user data / logs
+user/
+logs/
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+~$*

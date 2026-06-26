@@ -743,7 +743,7 @@ func _resize_cells() -> void:
 
 	var outer_margins := 40.0
 	if mobile_layout:
-		outer_margins = 12.0
+		outer_margins = 20.0
 	var board_padding := 20.0
 	var side_width := 270.0
 	var flow_gap := 14.0
@@ -954,7 +954,7 @@ func _update_root_margins(mobile_layout: bool) -> void:
 	var horizontal_margin := 20
 	var vertical_margin := 0
 	if mobile_layout:
-		horizontal_margin = 6
+		horizontal_margin = 10
 		vertical_margin = 6
 
 	root_margin.add_theme_constant_override("margin_left", horizontal_margin)
@@ -1014,7 +1014,7 @@ func _content_width() -> float:
 	var score_width: float = 270.0
 	var outer_margins := 40.0
 	if _use_mobile_layout():
-		outer_margins = 12.0
+		outer_margins = 20.0
 		var mobile_width: float = max(220.0, size.x - outer_margins)
 		return mobile_width
 
@@ -1089,7 +1089,9 @@ func _update_side_column_height() -> void:
 
 	if _use_mobile_layout():
 		var target_width: float = _content_width()
-		var item_width: float = max(90.0, floor((target_width - 16.0) / 3.0))
+		var panel_inner_padding := 20.0
+		var instrument_gaps := 16.0
+		var item_width: float = max(84.0, floor((target_width - panel_inner_padding - instrument_gaps) / 3.0))
 		var score_count: int = min(MAX_SCORES_PER_DIFFICULTY, _scores_for_current_difficulty().size())
 		var visible_score_rows: int = max(1, score_count)
 		var score_height: float = clamp(112.0 + visible_score_rows * 22.0, 132.0, 250.0)

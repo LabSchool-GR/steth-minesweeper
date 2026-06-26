@@ -496,6 +496,7 @@ func _create_buttons() -> void:
 			var button := Button.new()
 			button.focus_mode = Control.FOCUS_NONE
 			button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+			button.pressed.connect(_on_cell_pressed.bind(row, col))
 			button.gui_input.connect(_on_cell_input.bind(row, col))
 			button.add_theme_font_size_override("font_size", 21)
 			button.add_theme_constant_override("outline_size", 2)
@@ -562,19 +563,15 @@ func _on_cell_input(event: InputEvent, row: int, col: int) -> void:
 		if event.button_index == MOUSE_BUTTON_RIGHT:
 			_toggle_flag(row, col)
 			get_viewport().set_input_as_handled()
-		elif event.button_index == MOUSE_BUTTON_LEFT:
-			if flag_mode.button_pressed:
-				_toggle_flag(row, col)
-			else:
-				_open_cell(row, col)
-			get_viewport().set_input_as_handled()
 
-	if event is InputEventScreenTouch and event.pressed:
-		if flag_mode.button_pressed:
-			_toggle_flag(row, col)
-		else:
-			_open_cell(row, col)
-		get_viewport().set_input_as_handled()
+func _on_cell_pressed(row: int, col: int) -> void:
+	if game_finished:
+		return
+
+	if flag_mode.button_pressed:
+		_toggle_flag(row, col)
+	else:
+		_open_cell(row, col)
 
 
 func _toggle_flag(row: int, col: int) -> void:
@@ -1061,14 +1058,17 @@ func _update_side_column_height() -> void:
 	if _use_mobile_layout():
 		var target_width: float = _content_width()
 		var item_width: float = max(90.0, floor((target_width - 16.0) / 3.0))
-		var remaining_height: float = max(150.0, size.y - board_height - 360.0)
+		var score_count: int = min(MAX_SCORES_PER_DIFFICULTY, _scores_for_current_difficulty().size())
+		var visible_score_rows: int = max(1, score_count)
+		var score_height: float = clamp(112.0 + visible_score_rows * 22.0, 132.0, 250.0)
+		var score_scroll_height: float = clamp(34.0 + visible_score_rows * 22.0, 42.0, 150.0)
 		side_column.custom_minimum_size = Vector2(target_width, 0.0)
 		instruments_panel.custom_minimum_size = Vector2(target_width, 0.0)
 		flag_mode.custom_minimum_size = Vector2(item_width, 40.0)
 		mines_label.custom_minimum_size = Vector2(item_width, 40.0)
 		time_label.custom_minimum_size = Vector2(item_width, 40.0)
-		score_panel.custom_minimum_size = Vector2(target_width, remaining_height)
-		score_scroll.custom_minimum_size = Vector2(0.0, 42.0)
+		score_panel.custom_minimum_size = Vector2(target_width, score_height)
+		score_scroll.custom_minimum_size = Vector2(0.0, score_scroll_height)
 		return
 
 	side_column.custom_minimum_size = Vector2(270.0, board_height)

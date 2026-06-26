@@ -702,19 +702,25 @@ func _resize_cells() -> void:
 	grid.add_theme_constant_override("h_separation", int(current_cell_gap))
 	grid.add_theme_constant_override("v_separation", int(current_cell_gap))
 
+	var mobile_layout := _use_mobile_layout()
 	var outer_margins := 40.0
+	if mobile_layout:
+		outer_margins = 24.0
 	var board_padding := 20.0
 	var side_width := 270.0
 	var flow_gap := 14.0
 	var board_gaps: float = max(0, cols - 1) * current_cell_gap
 	var available_width: float = max(220.0, size.x - outer_margins - side_width - flow_gap)
-	if size.x < 760.0:
+	if mobile_layout or size.x < 760.0:
 		available_width = max(220.0, size.x - outer_margins)
 
 	var available_height: float = max(260.0, size.y - 250.0)
 	var cell_width: float = (available_width - board_padding - board_gaps) / cols
-	var cell_size: float = floor(min(44.0, min(cell_width, available_height / rows)))
-	cell_size = max(16.0, cell_size)
+	var max_cell_size := 44.0
+	if mobile_layout:
+		max_cell_size = 76.0
+	var cell_size: float = floor(min(max_cell_size, min(cell_width, available_height / rows)))
+	cell_size = max(18.0, cell_size)
 	current_cell_size = cell_size
 
 	for row in cell_buttons:
@@ -916,7 +922,10 @@ func _content_width() -> float:
 	var content_width: float = board_width + 14.0 + score_width
 
 	# Σε στενές οθόνες το TOP10 πέφτει κάτω από το ταμπλό, άρα το status ακολουθεί το πλάτος του ταμπλό.
-	if size.x > 0.0 and content_width > size.x - 40.0:
+	var outer_margins := 40.0
+	if _use_mobile_layout():
+		outer_margins = 24.0
+	if size.x > 0.0 and content_width > size.x - outer_margins:
 		content_width = max(board_width, score_width)
 
 	return content_width
@@ -955,12 +964,25 @@ func _update_vertical_centering() -> void:
 	if page_layout == null or top_spacer == null or bottom_spacer == null:
 		return
 
+	if _use_mobile_layout():
+		top_spacer.custom_minimum_size = Vector2(0.0, 12.0)
+		bottom_spacer.custom_minimum_size = Vector2(0.0, 12.0)
+		return
+
 	var content_height: float = page_layout.get_combined_minimum_size().y
 	var extra_space: float = max(0.0, size.y - content_height)
 	var spacer_height: float = floor(extra_space / 2.0)
 
 	top_spacer.custom_minimum_size = Vector2(0.0, spacer_height)
 	bottom_spacer.custom_minimum_size = Vector2(0.0, spacer_height)
+
+
+func _use_mobile_layout() -> bool:
+	# Σε πολλά κινητά το web export βλέπει physical/high-DPI pixels.
+	# Έτσι ένα portrait κινητό μπορεί να φαίνεται στον κώδικα "φαρδύ",
+	# ενώ ο χρήστης βλέπει μικροσκοπική desktop διάταξη. Με αυτόν τον έλεγχο
+	# δίνουμε προτεραιότητα στην αναλογία portrait και όχι μόνο στο απόλυτο πλάτος.
+	return size.x < 760.0 or (size.y > size.x * 1.25 and size.x < 1300.0)
 
 
 func _update_side_column_height() -> void:

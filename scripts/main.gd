@@ -27,7 +27,7 @@ const LANGUAGE_FILES := {
 	"en": "res://locales/en.json"
 }
 const DOCUMENTATION_URL := "https://github.com/LabSchool-GR/steth-minesweeper"
-const WINDOWS_DOWNLOAD_URL := "https://github.com/LabSchool-GR/steth-minesweeper/releases"
+const WINDOWS_DOWNLOAD_URL := "https://github.com/LabSchool-GR/steth-minesweeper/releases/latest/download/steth-minesweeper-windows.zip"
 
 # Κωδικοί Font Awesome. Οι γραμματοσειρές βρίσκονται στον φάκελο staff/webfonts.
 # Αν αλλάξει η γραμματοσειρά, αλλάζουμε μόνο αυτά τα codepoints.

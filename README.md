@@ -66,6 +66,12 @@ https://labschool-gr.github.io/steth-minesweeper/
 ..\Godot_v4.7-stable_win64_console.exe --path . --editor
 ```
 
+## Λήψη Για Windows
+
+Κατεβάστε την τελευταία έκδοση για MS Windows:
+
+[steth-minesweeper-windows.zip](https://github.com/LabSchool-GR/steth-minesweeper/releases/latest/download/steth-minesweeper-windows.zip)
+
 ## Δομή Project
 
 ```text
